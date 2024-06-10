@@ -1,40 +1,42 @@
-// import {applyMiddleware, createStore, compose} from 'redux'
-// import thunk from 'redux-thunk'
-// import { composeWithDevTools } from 'redux-devtools-extension'
-// import logger from 'redux-logger'
-// import {rootReducer} from './redux/rootReducer'
-// import {asyncIncrement, changeTheme, decrement, increment} from './redux/actions'
-//  import './styles.css'
+import { applyMiddleware, createStore, compose } from "redux";
+import "./styles.css";
+import { rootReducer } from "../src/redux/rootReducer";
+import {
+  asyncIncrement,
+  changeTheme,
+  decrement,
+  increment,
+} from "./redux/actions";
+import thunk from "redux-thunk";
+import logger from "redux-logger";
 
-// let state = 0;
-// const counter = document.querySelector('#counter')
-// const addBtn = document.querySelector('#add')
-// const subBtn = document.querySelector('#sub')
-// const asyncBtn = document.querySelector('#async')
-// const themeBtn = document.querySelector('#theme')
+const counter = document.querySelector("#counter");
+const addBtn = document.querySelector("#add");
+const subBtn = document.querySelector("#sub");
+const asyncBtn = document.querySelector("#async");
+const themeBtn = document.querySelector("#theme");
 
-// function render(){
-//   counter.textContent = state;
-// }
-// render();
+const store = createStore(rootReducer, applyMiddleware(thunk, logger));
+console.log(store);
+addBtn.addEventListener("click", function () {
+  store.dispatch(increment());
+});
 
-// addBtn.addEventListener('click', function(){
-//   state++;
-//   render();
-// })
+subBtn.addEventListener("click", () => {
+  store.dispatch(decrement());
+});
+store.subscribe(() => {
+  const state = store.getState();
+  counter.textContent = state.counter;
+  document.body.className = state.theme.value;
+});
+asyncBtn.addEventListener("click", () => {
+  store.dispatch(asyncIncrement());
+});
 
-// subBtn.addEventListener('click', ()=>{
-//   state--;
-//   render();
-// }) 
+themeBtn.addEventListener("click", () => {
+  const newTheme = document.body.classList.contains("light") ? "dark" : "light";
+  store.dispatch(changeTheme(newTheme));
+});
 
-// asyncBtn.addEventListener('click', ()=>{
-//   setTimeout(() =>{
-//     state++;
-//     render();
-//   }, 2000)
-// })
-
-// themeBtn.addEventListener('click', () =>{
-//   document.body.classList.toggle('dark')
-// })
+store.dispatch({ type: "INIT_APPLICATION" });
